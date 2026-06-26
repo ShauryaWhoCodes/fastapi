@@ -31,3 +31,13 @@ Books = [
 @app.get("/books")
 async def get_books():
     return Books
+
+
+# find book by its title
+@app.get("/books/{title}")
+async def get_books(title: str):
+    for book in Books:
+        if book.get("title").casefold() == title.casefold():
+            return book
+    return {"message": "No book found"}
+
