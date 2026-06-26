@@ -24,6 +24,12 @@ Books = [
         "title": "Focus",
         "author": "Freddy",
         "subject": "Philosophy"
+    },
+    {
+        "id": 4,
+        "title": "deep work",
+        "author": "Freddy",
+        "subject": "science"
     }
 ]
 
@@ -35,9 +41,17 @@ async def get_books():
 
 # find book by its title
 @app.get("/books/{title}")
-async def get_books(title: str):
+async def get_books_using_title(title: str):
     for book in Books:
         if book.get("title").casefold() == title.casefold():
             return book
     return {"message": "No book found"}
 
+# Query parameter
+@app.get("/books/{author}/")
+async def get_books_using_author(author: str, subject: str):
+    books = []
+    for book in Books:
+        if book.get("author").casefold() == author.casefold() and book.get("subject") == subject.casefold():
+            books.append(book)
+    return books
