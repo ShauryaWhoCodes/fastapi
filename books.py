@@ -34,3 +34,9 @@ async def get_books_using_author(author: str, subject: str):
 async def create_new_book(new_book=Body()):
     Books.append(new_book)
 
+# update an old book
+@app.put("/books/update_book")
+async def update_book(updated_book=Body()):
+    for i in range(len(Books)):
+        if Books[i].get("title").casefold() == updated_book.get("title").casefold():
+            Books[i] = updated_book
