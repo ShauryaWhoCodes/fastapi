@@ -1,38 +1,11 @@
-from fastapi import FastAPI
+from fastapi import Body, FastAPI
+from common import Books
 
 app = FastAPI()
-
 
 @app.get("/hello-world")
 async def first_api():
     return {"message": "Hello World!!"}
-
-
-Books = [
-    {
-        "id": 1,
-        "title": "The Book",
-        "author": "Joe Stantham",
-        "subject": "History"},
-    {
-        "id": 2,
-        "title": "The Alchemy Book",
-        "author": "Danny Mathur",
-        "subject": "Maths"},
-    {
-        "id": 3,
-        "title": "Focus",
-        "author": "Freddy",
-        "subject": "Philosophy"
-    },
-    {
-        "id": 4,
-        "title": "deep work",
-        "author": "Freddy",
-        "subject": "science"
-    }
-]
-
 
 @app.get("/books")
 async def get_books():
@@ -55,3 +28,9 @@ async def get_books_using_author(author: str, subject: str):
         if book.get("author").casefold() == author.casefold() and book.get("subject") == subject.casefold():
             books.append(book)
     return books
+
+# Create a new book
+@app.post("/books/new_book")
+async def create_new_book(new_book=Body()):
+    Books.append(new_book)
+
