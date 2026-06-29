@@ -57,7 +57,7 @@ async def read_book(id: int):
         if book.id == id:
             return book
 
-# fetch book using a id
+# fetch book using the id
 @app.get("/read_book/")
 async def read_book(rating: int):
     books = []
@@ -65,6 +65,14 @@ async def read_book(rating: int):
         if book.rating == rating:
             books.append(book)
     return books
+
+# update the book using ID
+@app.put("/update_book/")
+async def update_book(book: BookRequest):
+    for i in range(len(Books)):
+        if Books[i].id == book.id:
+            Books[i] = book
+            break
 
 
 
