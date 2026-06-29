@@ -43,7 +43,7 @@ Books = [
     Book(2, 'Book2', author='Author2', description='Description2', rating=3.0),
     Book(3, 'Book3', author='Author3', description='Description3', rating=2.0),
     Book(4, 'Book4', author='Author4', description='Description4', rating=4.0),
-    Book(5, 'Book5', author='Author5', description='Description5', rating=1.0),
+    Book(5, 'Book5', author='Author5', description='Description5', rating=5.0),
 ]
 
 @app.get("/read_all_books")
@@ -56,6 +56,15 @@ async def read_book(id: int):
     for book in Books:
         if book.id == id:
             return book
+
+# fetch book using a id
+@app.get("/read_book/")
+async def read_book(rating: int):
+    books = []
+    for book in Books:
+        if book.rating == rating:
+            books.append(book)
+    return books
 
 
 
