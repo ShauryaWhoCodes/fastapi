@@ -50,6 +50,15 @@ Books = [
 async def read_all_books():
     return Books
 
+# fetch book using a id
+@app.get("/read_book/{id}")
+async def read_book(id: int):
+    for book in Books:
+        if book.id == id:
+            return book
+
+
+
 #Create a new book
 @app.post("/create-book")
 async def create_new_book(book_request: BookRequest):
