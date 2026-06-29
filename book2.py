@@ -2,6 +2,7 @@ from typing import Optional
 
 from fastapi import FastAPI, Body
 from pydantic import BaseModel, Field
+from datetime import date, datetime
 
 app = FastAPI()
 
@@ -12,13 +13,15 @@ class Book:
     author: str
     description: str
     rating: float
+    published_date: date
 
-    def __init__(self, id: int, title: str, author: str, description: str, rating: float):
+    def __init__(self, id: int, title: str, author: str, description: str, rating: float, published_date: date):
         self.id = id
         self.title = title
         self.author = author
         self.description = description
         self.rating = rating
+        self.published_date = published_date
 
 class BookRequest(BaseModel):
     id: Optional[int] = Field(default=None, description="Id is only needed when creating a new book")
@@ -26,6 +29,7 @@ class BookRequest(BaseModel):
     author: str = Field(min_length=5)
     description: str = Field(min_length=2, max_length=100)
     rating: float = Field(gt=0, lt=6)
+    published_date: date = Field(ge=date(2000, 1, 1), lt=date.today())
 
     model_config = {
         "json_schema_extra": {
@@ -33,17 +37,18 @@ class BookRequest(BaseModel):
                 "title": "Book1",
                 "author": "Author1",
                 "description": "Description1",
-                "rating": 2
+                "rating": 2,
+                "published_date": date(2000, 1, 1),
             }
         }
     }
 
 Books = [
-    Book(1, 'Book1', author='Author1', description='Description1', rating=5.0),
-    Book(2, 'Book2', author='Author2', description='Description2', rating=3.0),
-    Book(3, 'Book3', author='Author3', description='Description3', rating=2.0),
-    Book(4, 'Book4', author='Author4', description='Description4', rating=4.0),
-    Book(5, 'Book5', author='Author5', description='Description5', rating=5.0),
+    Book(1, 'Book1', author='Author1', description='Description1', rating=5.0, published_date=date(2000, 1, 1)),
+    Book(2, 'Book2', author='Author2', description='Description2', rating=3.0, published_date=date(2002, 12, 2)),
+    Book(3, 'Book3', author='Author3', description='Description3', rating=2.0, published_date=date(2003, 2, 3)),
+    Book(4, 'Book4', author='Author4', description='Description4', rating=4.0, published_date=date(2004, 2, 2)),
+    Book(5, 'Book5', author='Author5', description='Description5', rating=5.0, published_date=date(2005, 10, 12)),
 ]
 
 @app.get("/read_all_books")
@@ -56,6 +61,15 @@ async def read_book(id: int):
     for book in Books:
         if book.id == id:
             return book
+
+# Fetch book using published date
+@app.get("/books/{published_date}")
+async def read_books(published_date: str):
+    published_date = datetime.strptime(published_date, "%Y-%m-%d").date()
+    for book in Books:
+        if book.published_date == published_date:
+            return book
+
 
 # fetch book using the id
 @app.get("/book/")
