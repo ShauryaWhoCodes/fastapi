@@ -51,14 +51,14 @@ async def read_all_books():
     return Books
 
 # fetch book using a id
-@app.get("/read_book/{id}")
+@app.get("/book/{id}")
 async def read_book(id: int):
     for book in Books:
         if book.id == id:
             return book
 
 # fetch book using the id
-@app.get("/read_book/")
+@app.get("/book/")
 async def read_book(rating: int):
     books = []
     for book in Books:
@@ -74,6 +74,13 @@ async def update_book(book: BookRequest):
             Books[i] = book
             break
 
+# Delete a book using id
+@app.delete("/book/{id}")
+async def delete_book(id: int):
+    for i in range(len(Books)):
+        if Books[i].id == id:
+            Books.pop(i)
+            break
 
 
 #Create a new book
