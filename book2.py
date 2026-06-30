@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Path, Query, HTTPException
 from pydantic import BaseModel, Field
 from datetime import date, datetime
 
@@ -61,6 +61,7 @@ async def read_book(id: int = Path(gt=0)):
     for book in Books:
         if book.id == id:
             return book
+    raise HTTPException(status_code=404, detail="Book not found")
 
 # Fetch book using published date
 @app.get("/books/{published_date}")
@@ -69,7 +70,7 @@ async def read_books(published_date: str):
     for book in Books:
         if book.published_date == published_date:
             return book
-
+    raise HTTPException(status_code=404, detail="Book not found")
 
 # fetch book using the rating
 @app.get("/book/")
@@ -78,24 +79,32 @@ async def read_book(rating: int = Query(gt=0, lt=6)):
     for book in Books:
         if book.rating == rating:
             books.append(book)
+    if len(books) == 0:
+        raise HTTPException(status_code=404, detail="Book not found")
     return books
 
 # update the book using ID
 @app.put("/update_book/")
 async def update_book(book: BookRequest):
+    book_changed = False
     for i in range(len(Books)):
         if Books[i].id == book.id:
             Books[i] = book
+            book_changed = True
             break
-
+    if not book_changed:
+        raise HTTPException(status_code=404, detail="Book not found")
 # Delete a book using id
 @app.delete("/book/{id}")
 async def delete_book(id: int = Path(gt=0)):
+    book_deleted = False
     for i in range(len(Books)):
         if Books[i].id == id:
             Books.pop(i)
+            book_deleted = True
             break
-
+    if not book_deleted:
+        raise HTTPException(status_code=404, detail="Book not found")
 
 #Create a new book
 @app.post("/create-book")
