@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi import FastAPI, Path, Query, HTTPException
 from pydantic import BaseModel, Field
 from datetime import date, datetime
+from starlette import status
 
 app = FastAPI()
 
@@ -51,12 +52,12 @@ Books = [
     Book(5, 'Book5', author='Author5', description='Description5', rating=5.0, published_date=date(2005, 10, 12)),
 ]
 
-@app.get("/read_all_books")
+@app.get("/read_all_books", status_code=status.HTTP_200_OK)
 async def read_all_books():
     return Books
 
 # fetch book using an id
-@app.get("/book/{id}")
+@app.get("/book/{id}", status_code=status.HTTP_200_OK)
 async def read_book(id: int = Path(gt=0)):
     for book in Books:
         if book.id == id:
@@ -64,7 +65,7 @@ async def read_book(id: int = Path(gt=0)):
     raise HTTPException(status_code=404, detail="Book not found")
 
 # Fetch book using published date
-@app.get("/books/{published_date}")
+@app.get("/books/{published_date}", status_code=status.HTTP_200_OK)
 async def read_books(published_date: str):
     published_date = datetime.strptime(published_date, "%Y-%m-%d").date()
     for book in Books:
@@ -73,7 +74,7 @@ async def read_books(published_date: str):
     raise HTTPException(status_code=404, detail="Book not found")
 
 # fetch book using the rating
-@app.get("/book/")
+@app.get("/book/", status_code=status.HTTP_200_OK)
 async def read_book(rating: int = Query(gt=0, lt=6)):
     books = []
     for book in Books:
@@ -84,7 +85,7 @@ async def read_book(rating: int = Query(gt=0, lt=6)):
     return books
 
 # update the book using ID
-@app.put("/update_book/")
+@app.put("/update_book/", status_code=status.HTTP_204_NO_CONTENT)
 async def update_book(book: BookRequest):
     book_changed = False
     for i in range(len(Books)):
@@ -95,7 +96,7 @@ async def update_book(book: BookRequest):
     if not book_changed:
         raise HTTPException(status_code=404, detail="Book not found")
 # Delete a book using id
-@app.delete("/book/{id}")
+@app.delete("/book/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(id: int = Path(gt=0)):
     book_deleted = False
     for i in range(len(Books)):
@@ -107,7 +108,7 @@ async def delete_book(id: int = Path(gt=0)):
         raise HTTPException(status_code=404, detail="Book not found")
 
 #Create a new book
-@app.post("/create-book")
+@app.post("/create-book", status_code=status.HTTP_201_CREATED)
 async def create_new_book(book_request: BookRequest):
     new_book = Book(**book_request.model_dump())
     Books.append(assign_new_book_id(new_book))
